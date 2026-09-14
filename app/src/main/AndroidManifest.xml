@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Core Device Owner Permissions -->
+    <uses-permission android:name="android.permission.MASTER_CLEAR" />
+    <uses-permission android:name="android.permission.REBOOT" />
+
+    <!-- Device Admin -->
+    <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN" />
+
+    <!-- System Access -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.DEVICE_POWER" />
+    <uses-permission android:name="android.permission.CHANGE_DEVICE_STATE" />
+
+    <!-- USB Detection -->
+    <uses-permission android:name="android.permission.HARDWARE_TEST" />
+
+    <!-- Lock Screen Monitoring -->
+    <uses-permission android:name="android.permission.RETRIEVE_WINDOW_CONTENT" />
+    <uses-permission android:name="android.permission.ACCESS_KEYGUARD_SECURE_STORAGE" />
+
+    <!-- File System Access -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="false"
+        android:debuggable="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Burn"
+        tools:targetApi="31">
+
+        <!-- Main Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Burn">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Device Admin Receiver (Required for Device Owner) -->
+        <receiver
+            android:name=".receiver.DeviceAdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+        </receiver>
+
+        <!-- USB Connection Detector -->
+        <receiver
+            android:name=".receivers.UsbConnectionReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_STATE" />
+                <action android:name="android.intent.action.USB_DEVICE_ATTACHED" />
+                <action android:name="android.intent.action.USB_DEVICE_DETACHED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Lockscreen State Receiver -->
+        <receiver
+            android:name=".receivers.LockscreenStateReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+                <action android:name="android.intent.action.SCREEN_ON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot Completion Receiver -->
+        <receiver
+            android:name=".receivers.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Wipe Service -->
+        <service
+            android:name=".services.WipeService"
+            android:exported="false" />
+
+        <!-- Lockscreen Monitor Service -->
+        <service
+            android:name=".services.LockscreenMonitor"
+            android:exported="false" />
+
+        <!-- Device Owner Manager Service -->
+        <service
+            android:name=".services.DeviceOwnerManager"
+            android:exported="false" />
+
+        <!-- Quick Settings Tile (Android 7.0+) -->
+        <service
+            android:name=".tile.BurnQuickSettingsTile"
+            android:exported="true"
+            android:icon="@drawable/ic_burn"
+            android:label="@string/quick_burn"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>
